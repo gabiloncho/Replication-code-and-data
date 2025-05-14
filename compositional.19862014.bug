@@ -1,0 +1,75 @@
+model{
+for (j in 1:n) {
+Y[j,1:2]~dmnorm(mu.Y[j,1:2],winv.e[j,1:2,1:2])
+Ynew[j,1:2]~dmnorm(mu.Y[j,1:2],winv.e[j,1:2,1:2])
+
+
+mu.Y[j,1]<-c[1]+b[1]*Urban[j]+b[2]*Income[j]+b[3]*Candidates[j]+b[4]*Illiterate[j]+b[5]*Young[j]+b[6]*Old[j]+b[7]*TRE[j]+
+		b[8]*Evote[j]+b[9]*Competitiveness[j]+
+		c[2]*Growth[j]+c[3]*Inflation[j]+
+		alpha[Election[j],1]+beta[State[j],1]
+
+mu.Y[j,2]<-c[4]+b[10]*Urban[j]+b[11]*Income[j]+b[12]*Candidates[j]+
+		b[13]*Illiterate[j]+b[14]*Young[j]+b[15]*Old[j]+b[16]*TRE[j]+b[17]*Evote[j]+b[18]*Competitiveness[j]+
+		c[5]*Growth[j]+c[6]*Inflation[j]+
+		alpha[Election[j],2]+beta[State[j],2]
+
+
+winv.e[j,1,1]<-w.e[j]*T[1,1]
+winv.e[j,1,2]<-w.e[j]*T[1,2]
+winv.e[j,2,1]<-w.e[j]*T[2,1]
+winv.e[j,2,2]<-w.e[j]* T[2,2]
+
+w.e[j]~dgamma(nu.ehalf,nu.ehalf)
+
+}
+
+T[1:2,1:2]~dwish(R[,],2)
+Sigma[1:2,1:2]<-inverse(T[1:2,1:2])
+rho<-Sigma[1,2]/sqrt(Sigma[1,1]*Sigma[2,2])
+
+for (j in 1:num.elections) {
+alpha[j,1:2]~dmnorm(mu.alpha[j,1:2],G[1:2,1:2])
+
+mu.alpha[j,1]<-0
+mu.alpha[j,2]<-0
+
+e.alpha1[j]<-alpha[j,1]-mu.alpha[j,1]
+e.alpha2[j]<-alpha[j,2]-mu.alpha[j,2]
+}
+
+
+for (j in 1:num.districts) {
+beta[j,1:2]~dmnorm(mu.beta[j,1:2],H[1:2,1:2])
+mu.beta[j,1]<-0
+mu.beta[j,2]<-0
+}
+
+for (m in 1:33) {
+prior.nue[m]<-1/33
+}
+
+k.e~dcat(prior.nue[])
+nu.einv<-k.e/100
+nu.e<-1/nu.einv
+nu.ehalf<-nu.e/2
+
+
+b[1:18]~dmnorm(b0[1:18],B[1:18,1:18]) 
+c[1:6]~dmnorm(c0[1:6],C[1:6,1:6])
+
+
+
+H[1:2,1:2]~dwish(H0[,],2)
+G[1:2,1:2]~dwish(G0[,],2)
+Sigma.district[1:2,1:2]<-inverse(H[1:2,1:2])
+Sigma.election[1:2,1:2]<-inverse(G[1:2,1:2])
+
+
+
+
+
+
+
+
+}
